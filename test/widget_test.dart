@@ -26,7 +26,7 @@ void main() {
 
     // Verificar el icono.
     expect(
-      find.byIcon(Icons.check_circle_outline),
+      find.byIcon(Icons.task_alt),
       findsOneWidget,
     );
   });
