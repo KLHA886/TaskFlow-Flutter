@@ -1,33 +1,46 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:taskflow/main.dart';
 
 void main() {
-  testWidgets('Verificar pantalla de bienvenida TaskFlow',
-      (WidgetTester tester) async {
-    // Iniciar la aplicación TaskFlow.
+  testWidgets('Verificar estado y acciones de TaskFlow', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const TaskFlowApp());
 
-    // Verificar el título.
-    expect(find.text('TaskFlow'), findsOneWidget);
+    // Verificar estado inicial.
+    expect(find.text('¡Hola, Karen Holguin!'), findsOneWidget);
+    expect(find.text('Tareas pendientes: 3'), findsOneWidget);
+    expect(find.text('Completadas hoy: 0 de 5'), findsOneWidget);
 
-    // Verificar el nombre.
+    // Agregar una tarea.
+    await tester.tap(find.text('Agregar tarea'));
+    await tester.pump();
+
+    expect(find.text('Tareas pendientes: 4'), findsOneWidget);
+
+    // Completar una tarea.
+    await tester.tap(find.text('Completar una tarea'));
+    await tester.pump();
+
+    expect(find.text('Tareas pendientes: 3'), findsOneWidget);
+    expect(find.text('Completadas hoy: 1 de 5'), findsOneWidget);
+
+    // Completar las tareas restantes.
+    for (int i = 0; i < 3; i++) {
+      await tester.tap(find.text('Completar una tarea'));
+      await tester.pump();
+    }
+
+    expect(find.text('Tareas pendientes: 0'), findsOneWidget);
+    expect(find.text('Completadas hoy: 4 de 5'), findsOneWidget);
     expect(
-      find.text('¡Hola, Karen Holguin!'),
+      find.text('¡Excelente! No tienes tareas pendientes.'),
       findsOneWidget,
     );
 
-    // Verificar las tareas pendientes.
-    expect(
-      find.text('Tareas pendientes: 5'),
-      findsOneWidget,
-    );
-
-    // Verificar el icono.
-    expect(
-      find.byIcon(Icons.task_alt),
-      findsOneWidget,
-    );
+    // Verificar que el botón esté deshabilitado.
+    final button = tester.widget<OutlinedButton>(find.byType(OutlinedButton));
+    expect(button.onPressed, isNull);
   });
 }
