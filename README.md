@@ -76,3 +76,56 @@ La entidad Task contiene:
 - DELETE /tasks/:id: eliminar una tarea.
 
 La API se seleccionará más adelante. Estas rutas representan las operaciones previstas y todavía no están conectadas a un servidor.
+
+## API de tareas
+
+TaskFlow utiliza la API pública JSONPlaceholder para consultar tareas mediante peticiones HTTP GET.
+
+**URL base:** https://jsonplaceholder.typicode.com
+
+**Endpoint utilizado:** `GET /todos?userId=2`
+
+**URL completa:** https://jsonplaceholder.typicode.com/todos?userId=2
+
+### Datos recibidos
+
+La API devuelve las tareas del usuario 2 en formato JSON. Cada tarea contiene los siguientes campos:
+
+- `userId`: identificador del usuario.
+- `id`: identificador de la tarea.
+- `title`: título de la tarea.
+- `completed`: indica si la tarea está completada.
+
+### Adaptación al modelo Task
+
+El modelo `Task` de nuestra aplicación utiliza seis propiedades. Como la API no proporciona todos los campos, TaskFlow realiza las siguientes adaptaciones:
+
+- `completed` se convierte en `isCompleted`.
+- `description` recibe el valor predeterminado `Sin descripción (API)`.
+- `priority` recibe el valor predeterminado `Sin prioridad (API)`.
+
+Los valores predeterminados son agregados por TaskFlow y no provienen del servidor.
+
+### Arquitectura utilizada
+
+La aplicación conserva la arquitectura MVVM con Provider:
+
+1. `TaskApiService` utiliza Dio para consultar la API REST.
+2. `RemoteTaskRepository` obtiene las tareas mediante el servicio.
+3. `Task.fromJson()` convierte los datos JSON en objetos `Task`.
+4. `TasksViewModel` carga las tareas de forma asíncrona y notifica los cambios.
+5. `TaskListScreen` muestra las tareas y permite acceder a sus detalles.
+
+### Actualización de tareas
+
+Actualmente, el botón para marcar una tarea como completada modifica únicamente los datos almacenados temporalmente en memoria.
+
+Estos cambios no se guardan en JSONPlaceholder. Al reiniciar la aplicación, las tareas recuperan los estados enviados por la API.
+
+### Verificación
+
+Se comprobó la conexión mediante la respuesta:
+
+`GET /todos?userId=2 → HTTP 200`
+
+También se verificó que TaskFlow muestra las tareas remotas y permite navegar a su pantalla de detalle.
