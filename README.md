@@ -129,3 +129,47 @@ Se comprobó la conexión mediante la respuesta:
 `GET /todos?userId=2 → HTTP 200`
 
 También se verificó que TaskFlow muestra las tareas remotas y permite navegar a su pantalla de detalle.
+
+## Semana 4 – Sesión 8: Estados de carga y recuperación
+
+En esta sesión se mejoró TaskFlow para gestionar los diferentes resultados de una consulta HTTP a la API JSONPlaceholder.
+
+### Estados implementados
+
+- **Carga:** se muestra un indicador circular mientras se esperan las tareas.
+- **Datos:** se presenta la lista de tareas obtenidas de la API.
+- **Vacío:** cuando la API devuelve una lista sin tareas, aparece el mensaje «Todavía no hay tareas para mostrar» y el botón «Actualizar».
+- **Error:** cuando falla la conexión, aparece el mensaje «No se pudieron cargar las tareas» y el botón «Reintentar».
+
+### Acciones del usuario
+
+Se incorporó un botón de actualización en la barra superior y la opción de deslizar hacia abajo para volver a consultar las tareas.
+
+El botón «Reintentar» permite repetir una consulta cuando ocurre un error, sin necesidad de reiniciar la aplicación.
+
+### Pruebas realizadas
+
+Se verificaron los siguientes escenarios:
+
+1. Consulta correcta con `userId = 2`.
+2. Lista vacía utilizando temporalmente `userId = 9999`.
+3. Error de conexión utilizando temporalmente `https://jsonplaceholder.invalid`.
+4. Restauración de la dirección correcta de JSONPlaceholder.
+5. Ejecución de `flutter analyze` sin problemas.
+6. Ejecución de `flutter test` con todas las pruebas aprobadas.
+
+### Resultado
+
+TaskFlow conserva su arquitectura MVVM con Provider y ahora permite mostrar estados de carga, datos, vacío y error, además de ofrecer acciones para actualizar y reintentar consultas.
+
+### Evidencia de recuperación sin reiniciar
+
+Para comprobar el funcionamiento del botón «Reintentar», se utilizó Chrome DevTools, en la pestaña Network.
+
+Primero se activó el modo Offline y se intentó actualizar la lista, provocando un error de conexión. TaskFlow mostró el mensaje correspondiente y el botón «Reintentar».
+
+Después se restauró la conexión seleccionando No throttling y se presionó «Reintentar», sin reiniciar Flutter ni Chrome.
+
+La lista de tareas volvió a aparecer correctamente. En Network se observó una respuesta HTTP 304 (Not Modified), que permitió reutilizar los datos almacenados en caché.
+
+**Resultado:** se comprobó que TaskFlow puede recuperarse de un error de conexión mediante el botón «Reintentar», sin reiniciar la aplicación.
