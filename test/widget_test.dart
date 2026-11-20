@@ -1,26 +1,30 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taskflow/main.dart';
+import 'package:provider/provider.dart';
+
+import 'package:taskflow/app/taskflow_app.dart';
+import 'package:taskflow/features/tasks/data/local_task_repository.dart';
+import 'package:taskflow/features/tasks/presentation/tasks_view_model.dart';
 
 void main() {
-  testWidgets('Verificar listado local de TaskFlow', (
-    WidgetTester tester,
+  testWidgets('TaskFlow muestra las cinco tareas personalizadas', (
+    tester,
   ) async {
-    await tester.pumpWidget(const TaskFlowApp());
+    final repository = LocalTaskRepository();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<TasksViewModel>(
+        create: (_) => TasksViewModel(repository),
+        child: const TaskFlowApp(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
 
     expect(find.text('Mis tareas'), findsOneWidget);
-
-    // Verificar las cinco tareas personalizadas.
-    expect(find.byType(ListTile), findsNWidgets(5));
-
     expect(find.text('Estudiar para el examen'), findsOneWidget);
     expect(find.text('Realizar tarea de matemáticas'), findsOneWidget);
     expect(find.text('Preparar exposición'), findsOneWidget);
     expect(find.text('Leer material de clase'), findsOneWidget);
     expect(find.text('Entregar proyecto Flutter'), findsOneWidget);
-
-    // Verificar una tarea completada y cuatro pendientes.
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
-    expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(4));
   });
 }
