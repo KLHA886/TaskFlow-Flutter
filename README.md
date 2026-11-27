@@ -173,3 +173,22 @@ Después se restauró la conexión seleccionando No throttling y se presionó «
 La lista de tareas volvió a aparecer correctamente. En Network se observó una respuesta HTTP 304 (Not Modified), que permitió reutilizar los datos almacenados en caché.
 
 **Resultado:** se comprobó que TaskFlow puede recuperarse de un error de conexión mediante el botón «Reintentar», sin reiniciar la aplicación.
+
+## Semana 5 – Sesión 10: Operaciones CRUD con API REST
+
+Se implementaron las operaciones CRUD de tareas utilizando Dio, Provider y la arquitectura MVVM.
+
+- GET: consultar tareas desde la API.
+- POST: crear nuevas tareas.
+- PATCH: actualizar el título de una tarea.
+- DELETE: eliminar tareas mediante una confirmación previa.
+- Actualización de la interfaz mediante ChangeNotifier.
+- Manejo de errores en las operaciones de creación, edición y eliminación.
+
+### Limitaciones de la API
+
+JSONPlaceholder es una API de prueba que simula las operaciones POST, PATCH y DELETE. Los cambios se reflejan temporalmente en la aplicación, pero no se almacenan permanentemente en el servidor.
+
+Al realizar una nueva consulta GET o reiniciar la aplicación, se recuperan los datos originales de la API.
+
+La descripción y la prioridad de las tareas nuevas se mantienen localmente durante la ejecución de la aplicación.

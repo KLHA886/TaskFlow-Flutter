@@ -42,6 +42,128 @@ class TaskDetailScreen extends StatelessWidget {
                         : 'Marcar como completada',
                   ),
                 ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Editar tarea'),
+                  onPressed: () async {
+                    String editedTitle = task.title;
+
+                    final newTitle = await showDialog<String>(
+                      context: context,
+                      builder: (dialogContext) {
+                        return AlertDialog(
+                          title: const Text('Editar tarea'),
+                          content: TextFormField(
+                            initialValue: task.title,
+                            decoration: const InputDecoration(
+                              labelText: 'Título',
+                            ),
+                            onChanged: (value) {
+                              editedTitle = value;
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext);
+                              },
+                              child: const Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(
+                                  dialogContext,
+                                  editedTitle.trim(),
+                                );
+                              },
+                              child: const Text('Guardar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (!context.mounted ||
+                        newTitle == null ||
+                        newTitle.length < 3) {
+                      return;
+                    }
+
+                    try {
+                      await context.read<TasksViewModel>().updateTask(
+                        task.copyWith(title: newTitle),
+                      );
+
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Tarea actualizada correctamente.'),
+                        ),
+                      );
+                    } catch (error) {
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No se pudo actualizar la tarea.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Eliminar tarea'),
+                  style: ElevatedButton.styleFrom(foregroundColor: Colors.red),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) {
+                        return AlertDialog(
+                          title: const Text('Eliminar tarea'),
+                          content: Text('¿Eliminar ${task.title}?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext, false);
+                              },
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext, true);
+                              },
+                              child: const Text('Eliminar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (!context.mounted || confirmed != true) {
+                      return;
+                    }
+
+                    try {
+                      await context.read<TasksViewModel>().deleteTask(task.id);
+
+                      if (!context.mounted) return;
+
+                      Navigator.pop(context);
+                    } catch (error) {
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No se pudo eliminar la tarea.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
     );
